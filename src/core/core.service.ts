@@ -1,19 +1,30 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CoreRepository } from './repository/core.repository';
+import { SettingMapper } from './entities/setting.mapper';
+import { SettingDto } from './dto/setting.dto';
+import { ValueMapper } from './entities/value.mapper';
 
 @Injectable()
 export class CoreService {
   constructor(private readonly repository: CoreRepository) {}
 
   async options() {
-    return await this.repository.options();
+    const res = await this.repository.options();
+    return res as SettingDto[];
   }
 
   async setting(key: string) {
-    return await this.repository.setting(key);
+    const res = await this.repository.setting(key);
+    return SettingMapper.toDtoIncluceValue(res);
   }
 
-  async create(key: string, value: string, appcode: string, is_all: boolean) {
+  async create(
+    key: string,
+    description: string,
+    value: string,
+    appcode: string,
+    is_all: boolean,
+  ) {
     const isExist = await this.repository.findSettingByAppCodeAndKey(
       appcode,
       key,
@@ -23,11 +34,27 @@ export class CoreService {
         'Ya existe una configuración para esta aplicación',
       );
     }
-    return await this.repository.create(key, value, appcode, is_all);
+    const res = await this.repository.create(
+      key,
+      description,
+      value,
+      appcode,
+      is_all,
+    );
+    return SettingMapper.toDto(res);
   }
 
+  async update(id: number, key: string, description: string) {
+    const res = await this.repository.update(id, key, description);
+    return SettingMapper.toDto(res);
+  }
+
+  async delete(id: number) {
+    return await this.repository.deleteSetting(id);
+  }
   async updateValue(id: number, value: string) {
-    return await this.repository.updateValue(id, value);
+    const res = await this.repository.updateValue(id, value);
+    return ValueMapper.toDto(res);
   }
 
   async deleteValue(id: number) {

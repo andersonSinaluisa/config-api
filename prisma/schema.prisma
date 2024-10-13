@@ -16,6 +16,7 @@ datasource db {
 
 model Smtp {
   id Int @default(autoincrement()) @id
+  host String
   email String
   password String
   port Int
@@ -29,6 +30,7 @@ model Settings{
   id Int @default(autoincrement()) @id
   key String
   values Values[]
+  description String
   app_code String
   is_all Boolean
   is_active Boolean @default(true)

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Settings, Values } from '@prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 @Injectable()
@@ -6,7 +7,7 @@ export class CoreRepository {
   constructor(private prismaService: PrismaService) {}
 
   async options() {
-    return await this.prismaService.settings.findMany({
+    const res = await this.prismaService.settings.findMany({
       orderBy: {
         key: 'desc',
       },
@@ -14,10 +15,11 @@ export class CoreRepository {
         is_active: true,
       },
     });
+    return res;
   }
 
   async setting(key: string) {
-    return await this.prismaService.settings.findFirst({
+    const res = await this.prismaService.settings.findFirst({
       where: {
         key: key,
         is_active: true,
@@ -26,10 +28,12 @@ export class CoreRepository {
         values: true,
       },
     });
+
+    return res;
   }
 
   async findSettingByAppCodeAndKey(appcode: string, key: string) {
-    return await this.prismaService.settings.findFirst({
+    const res = await this.prismaService.settings.findFirst({
       where: {
         key: key,
         app_code: appcode,
@@ -39,13 +43,22 @@ export class CoreRepository {
         values: true,
       },
     });
+
+    return res;
   }
 
-  async create(key: string, value: string, appcode: string, is_all: boolean) {
-    return await this.prismaService.settings.create({
+  async create(
+    key: string,
+    description: string,
+    value: string,
+    appcode: string,
+    is_all: boolean,
+  ) {
+    const res = await this.prismaService.settings.create({
       data: {
         key: key,
         app_code: appcode,
+        description: description,
         values: {
           create: {
             value: value,
@@ -54,10 +67,24 @@ export class CoreRepository {
         is_all: is_all,
       },
     });
+    return res as Settings;
+  }
+
+  async update(id: number, key: string, description: string) {
+    const res = await this.prismaService.settings.update({
+      where: {
+        id: id,
+      },
+      data: {
+        key: key,
+        description: description,
+      },
+    });
+    return res as Settings;
   }
 
   async updateValue(id: number, value: string) {
-    return await this.prismaService.values.update({
+    const res = await this.prismaService.values.update({
       where: {
         id: id,
       },
@@ -65,10 +92,11 @@ export class CoreRepository {
         value: value,
       },
     });
+    return res as Values;
   }
 
   async deleteValue(id: number) {
-    return await this.prismaService.values.update({
+    await this.prismaService.values.update({
       data: {
         is_active: false,
       },
@@ -76,6 +104,7 @@ export class CoreRepository {
         id: id,
       },
     });
+    return true;
   }
 
   async updateSetting(
@@ -84,7 +113,7 @@ export class CoreRepository {
     appcode: string,
     is_all: boolean,
   ) {
-    return await this.prismaService.settings.update({
+    const res = await this.prismaService.settings.update({
       where: {
         id: id,
       },
@@ -94,10 +123,11 @@ export class CoreRepository {
         is_all: is_all,
       },
     });
+    return res as Settings;
   }
 
   async deleteSetting(id: number) {
-    return await this.prismaService.settings.update({
+    await this.prismaService.settings.update({
       data: {
         is_active: false,
         values: {
@@ -115,5 +145,6 @@ export class CoreRepository {
         id: id,
       },
     });
+    return true;
   }
 }
