@@ -10,6 +10,7 @@ export class EventsController {
   @MessagePattern('send-mail')
   handleMessage(@Payload() message: KafkaMessage) {
     // Procesa el mensaje aquí
+    console.log('Message value:', message.value.toString());
     const payload = SendMailMapper.toEntity(message.value.toString());
     return this.eventsService.sendDynamicMail(
       payload.app_code,

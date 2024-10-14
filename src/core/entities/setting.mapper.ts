@@ -28,6 +28,7 @@ export class SettingMapper {
     key: string;
     app_code: string;
     is_all: boolean;
+    description: string;
     is_active: boolean;
     values: {
       id: number;
@@ -42,6 +43,7 @@ export class SettingMapper {
       is_all: data.is_all,
       is_active: data.is_active,
       key: data.key,
+      description: data.description,
       values: data.values,
     } as SettingValueDto;
   }

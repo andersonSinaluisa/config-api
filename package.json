@@ -27,6 +27,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.20.0",
     "config-api": "file:",
+    "express-session": "^1.18.1",
     "handlebars": "^4.7.8",
     "kafkajs": "^2.2.4",
     "nodemailer": "^6.9.15",

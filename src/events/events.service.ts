@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SentMessageInfo } from 'nodemailer';
-import { MailRepository } from 'src/mail/repository/mail.repository';
+import { MailRepository } from '../mail/repository/mail.repository';
 
 @Injectable()
 export class EventsService {
