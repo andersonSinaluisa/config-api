@@ -1,14 +1,13 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { SentMessageInfo } from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { MailRepository } from '../mail/repository/mail.repository';
-
+import * as handlebars from 'handlebars';
+import path from 'path';
+import fs from 'fs';
 @Injectable()
 export class EventsService {
-  constructor(
-    private readonly mailRepository: MailRepository,
-    private readonly mailerService: MailerService,
-  ) {}
+  constructor(private readonly mailRepository: MailRepository) { }
 
   async sendDynamicMail(
     app_code: string,
@@ -16,7 +15,7 @@ export class EventsService {
     subject: string,
     template: string,
     context: any,
-  ): Promise<SentMessageInfo> {
+  ) {
     // Obtener las credenciales SMTP de la base de datos
     const smtpConfig = await this.mailRepository.findForApp(app_code);
     if (!smtpConfig) {
@@ -26,24 +25,40 @@ export class EventsService {
     }
 
     // Crear una instancia del servicio Mailer con las credenciales dinámicas
-    this.mailerService.addTransporter('dynamicTransport', {
+
+    const transporter = nodemailer.createTransport({
       host: smtpConfig.host,
-      secure: smtpConfig.isSecure,
+      port: smtpConfig.port,
+      secure: false, // or true based on your SMTP configuration
       auth: {
         user: smtpConfig.email,
         pass: smtpConfig.password,
       },
-      port: smtpConfig.port,
     });
 
+    const htmlfile = path.join(__dirname, 'templates', template);
+    const htmlcontent = fs.readFileSync(htmlfile, 'utf8');
+
+    const template_ = handlebars.compile(htmlcontent);
+
+    const htmlToSend = template_(context);
+    console.log(htmlToSend);
     // Enviar el correo usando el transporte dinámico
-    const res: SentMessageInfo = await this.mailerService.sendMail({
-      to, // destinatario
-      subject, // asunto del correo
-      template: './src/mail/templates/' + template, // plantilla de correo
-      context, // contexto de la plantilla (datos dinámicos)
-      transporterName: 'dynamicTransport', // nombre del transporte
-    });
-    return res as SentMessageInfo;
+    const res = transporter.sendMail(
+      {
+        from: smtpConfig.email, // remitente
+        to, // destinatario
+        subject, // asunto del correo
+        html: htmlToSend, // plantilla HTML
+        priority: 'high', // prioridad del correo
+      },
+      (err, info) => {
+        if (err) {
+          console.error(err);
+        }
+        console.log(info);
+      },
+    );
+    return res;
   }
 }

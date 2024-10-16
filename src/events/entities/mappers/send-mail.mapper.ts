@@ -1,6 +1,6 @@
 export class SendMailMapper {
-  static toEntity(data: string): any {
-    const parsed = JSON.parse(data);
+  static toEntity(data: object): any {
+    const parsed = JSON.parse(JSON.stringify(data));
     return {
       app_code: parsed.app_code,
       to: parsed.to,

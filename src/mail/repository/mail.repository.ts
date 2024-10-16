@@ -4,7 +4,7 @@ import { PrismaService } from '../../shared/prisma/prisma.service';
 
 @Injectable()
 export class MailRepository {
-  constructor(private readonly db: PrismaService) {}
+  constructor(private readonly db: PrismaService) { }
 
   async create(data: Smtp) {
     return await this.db.smtp.create({

@@ -6,12 +6,10 @@ import { EventsService } from './events.service';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
   @MessagePattern('send-mail')
-  handleMessage(@Payload() message: KafkaMessage) {
-    // Procesa el mensaje aquí
-    console.log('Message value:', message.value.toString());
-    const payload = SendMailMapper.toEntity(message.value.toString());
+  handleMessage(@Payload() message: object) {
+    const payload = SendMailMapper.toEntity(message);
     return this.eventsService.sendDynamicMail(
       payload.app_code,
       payload.to,
