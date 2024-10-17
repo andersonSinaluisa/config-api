@@ -73,4 +73,12 @@ export class MailRepository {
       },
     });
   }
+
+  async findOneGeneral() {
+    return await this.db.smtp.findFirst({
+      where: {
+        is_all: true,
+      },
+    });
+  }
 }

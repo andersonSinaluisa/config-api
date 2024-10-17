@@ -6,9 +6,13 @@ import { MailModule } from './mail/mail.module';
 import { SharedModule } from './shared/shared.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { EventsModule } from './events/events.module';
+import { CommandRunnerModule } from 'nest-commander';
+import { CreateStmpCommand } from './commands/create-smtp-command';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
+    CommandRunnerModule,
     CoreModule,
     MailModule,
     SharedModule,
@@ -30,6 +34,6 @@ import { EventsModule } from './events/events.module';
     EventsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MailService, CreateStmpCommand],
 })
-export class AppModule {}
+export class AppModule { }
