@@ -41,9 +41,8 @@ export class EventsService {
     const htmlcontent = fs.readFileSync(htmlfile, 'utf8');
 
     const template_ = handlebars.compile(htmlcontent);
-
+    console.log(context)
     const htmlToSend = template_(context);
-    console.log(htmlToSend);
     // Enviar el correo usando el transporte dinámico
     const res = transporter.sendMail(
       {
@@ -58,6 +57,7 @@ export class EventsService {
           console.error(err);
         }
         console.log(info);
+
       },
     );
     return res;
